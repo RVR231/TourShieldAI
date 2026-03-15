@@ -1,4 +1,4 @@
-# SafeTourAI 🛡️
+# TourShieldAI 🛡️
 
 A comprehensive blockchain-powered platform for secure tourism with KYC verification, digital identity management, and emergency response systems.
 
@@ -206,7 +206,7 @@ dashboard-user/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/SafeTourAI.git
+   git clone https://github.com/RVR231/TourShieldAI/edit/main/README.md
    cd SafeTourAI
    ```
 
@@ -398,13 +398,6 @@ Make sure to set all environment variables in your deployment platform:
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-For support and questions:
-- Create an issue on GitHub
-- Email: support@safetourai.com
-- Documentation: [Wiki](https://github.com/yourusername/SafeTourAI/wiki)
-
 ## 🔄 Version History
 
 - **v1.0.0** - Initial release with core features
@@ -422,10 +415,6 @@ For support and questions:
 - All contributors who helped build this platform
 
 ---
-
-**SafeTourAI** - Making tourism safer through blockchain technology and digital identity verification.
-
-# SafeTour AI
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
