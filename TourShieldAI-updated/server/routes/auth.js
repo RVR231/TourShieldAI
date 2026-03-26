@@ -106,7 +106,7 @@ router.post('/register', [
         verified: false
       });
 
-      // Send OTP email with cloud fallback
+      // Send OTP email - never block registration if email fails
       try {
         await emailService.sendOTP(email, otp, name, role);
         console.log('📧 OTP sent successfully via primary service', { email, role });
@@ -122,7 +122,7 @@ router.post('/register', [
           } catch (cloudError) {
             console.error('❌ Cloud email service also failed:', cloudError);
             console.log(`📋 All email services failed, OTP for debugging - ${email}: ${otp}`);
-            throw new AppError('Failed to send verification email. Please try again later.', 500, 'EMAIL_SEND_FAILED');
+            console.log('Email failed but continuing registration for:', email);
           }
         } else {
           // In development, log the OTP and continue
