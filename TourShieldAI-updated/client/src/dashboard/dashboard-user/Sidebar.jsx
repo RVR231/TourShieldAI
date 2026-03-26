@@ -1,0 +1,244 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from './contexts/LanguageContext';
+import toast from 'react-hot-toast';
+import { 
+  FiHome, 
+  FiAlertTriangle, 
+  FiUsers, 
+  FiUser, 
+  FiShield, 
+  FiBarChart2 as FiBarChart3, 
+  FiSettings, 
+  FiMenu, 
+  FiX,
+  FiLogOut,
+  FiDatabase,
+  FiCheckCircle,
+  FiUserCheck,
+  FiCreditCard,
+  FiFileText,
+  FiDollarSign as FiWallet,
+  FiMessageCircle,
+  FiWatch,
+  FiMic,
+  FiGift
+} from 'react-icons/fi';
+
+const Sidebar = ({ activeTab, setActiveTab }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { t } = useLanguage();
+  
+  // Listen for toggle events from navbar
+  useEffect(() => {
+    const handleToggle = () => setIsOpen(!isOpen);
+    window.addEventListener('toggleSidebar', handleToggle);
+    return () => window.removeEventListener('toggleSidebar', handleToggle);
+  }, [isOpen]);
+  
+  // Check authentication from localStorage
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('userData');
+    return !!(token && userData);
+  };
+  
+  // Get current user from localStorage
+  const getCurrentUser = () => {
+    try {
+      const userData = localStorage.getItem('userData');
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
+  };
+  
+  const user = getCurrentUser();
+  const userIsAuthenticated = isAuthenticated();
+
+  const menuItems = [
+    { id: 'dashboard', label: t('nav.dashboard', 'Dashboard'), icon: FiHome, route: '/dashboard-user', useTab: true },
+    { id: 'profile', label: t('nav.userProfiles', 'User Profiles'), icon: FiUser, route: '/profile', useTab: true },
+    { id: 'chatbot', label: t('nav.safeTourChatbot', 'TourShield Chatbot'), icon: FiMessageCircle, route: '/chatbot', useTab: true },
+    { id: 'smartwatch', label: t('nav.smartwatchConnect', 'SmartWatch Connect'), icon: FiWatch, route: '/smartwatch', useTab: true },
+    { id: 'virtual-watch', label: t('nav.virtualWatch', 'Virtual Watch'), icon: FiWatch, route: '/virtual-watch', useTab: true },
+    { id: 'blockchain-reward', label: t('nav.blockchainReward', 'Blockchain Reward'), icon: FiGift, route: '/blockchain-reward', useTab: true },
+    { id: 'wallet', label: t('nav.cryptoWallet', 'Crypto Wallet'), icon: FiWallet, route: '/wallet', useTab: false },
+    { id: 'digital-id', label: t('nav.digitalId', 'Digital ID'), icon: FiCreditCard, route: '/digital-id', useTab: false },
+    { id: 'kyc', label: t('nav.kycVerification', 'KYC Verification'), icon: FiFileText, route: '/kyc', useTab: false },
+    { id: 'emergency', label: t('nav.emergencySos', 'Emergency SOS'), icon: FiAlertTriangle, route: '/emergency', useTab: true },
+    { id: 'voice-emergency', label: t('nav.voiceEmergency', 'Voice Emergency'), icon: FiMic, route: '/voice-emergency', useTab: true },
+    { id: 'responder', label: t('nav.responderPanel', 'Responder Panel'), icon: FiUsers, route: '/responder', useTab: true },
+    { id: 'blockchain', label: t('nav.blockchainRecords', 'Blockchain Records'), icon: FiDatabase, route: '/blockchain', useTab: true },
+    { id: 'analytics', label: t('nav.analytics', 'Analytics'), icon: FiBarChart3, route: '/analytics', useTab: true },
+    { id: 'settings', label: t('nav.settings', 'Settings'), icon: FiSettings, route: '/settings', useTab: true },
+  ];
+
+  const handleMenuClick = (itemId, route, useTab) => {
+    if (useTab) {
+      // Use setActiveTab for dashboard navigation
+      setActiveTab(itemId);
+    } else {
+      // Use React Router navigation for standalone pages
+      navigate(route);
+    }
+    setIsOpen(false);
+  };
+
+  const handleLogout = async () => {
+    const loadingToast = toast.loading('Signing you out...', {
+      position: 'top-center'
+    });
+    
+    // Call logout function (clears localStorage)
+    logout();
+    
+    toast.dismiss();
+    toast.success('Logged out successfully!', {
+      position: 'top-center',
+      duration: 2000
+    });
+    
+    setTimeout(() => {
+      navigate('/login');
+      setIsOpen(false);
+    }, 1000);
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-40
+        w-64 bg-white shadow-xl border-r border-gray-200
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        flex flex-col lg:translate-x-0
+      `}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '256px',
+          height: '100vh',
+          zIndex: 40,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: '60px'
+        }}
+      >
+        <div className="flex flex-col h-full">
+
+          {/* Navigation Menu */}
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {menuItems.map((item) => {
+              const isActive = activeTab === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuClick(item.id, item.route, item.useTab)}
+                  className={`
+                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                    text-left transition-all duration-200
+                    ${isActive 
+                      ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                    }
+                  `}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span className="font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* User Profile & Auth Button */}
+          <div className="p-4 border-t border-gray-200 flex-shrink-0">
+            {userIsAuthenticated ? (
+              <>
+                {/* Desktop: Vertical layout with user info */}
+                <div className="hidden lg:block">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : 
+                         user?.fullName ? user.fullName.charAt(0).toUpperCase() : 
+                         user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">
+                        {user?.name || user?.fullName || user?.displayName || 'Demo User'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {user?.email || 'demo@example.com'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                             text-red-600 hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <FiLogOut className="w-5 h-5" />
+                    <span className="font-medium">{t('nav.logout', 'Logout')}</span>
+                  </button>
+                </div>
+                
+                {/* Mobile: Horizontal layout - Avatar left, Logout right */}
+                <div className="lg:hidden flex items-center justify-between sidebar-mobile-layout w-full">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-semibold text-sm">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : 
+                       user?.fullName ? user.fullName.charAt(0).toUpperCase() : 
+                       user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                    </span>
+                  </div><button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200 flex-shrink-0 ml-auto"
+                  >
+                    <FiLogOut className="w-4 h-4" />
+                    <span className="font-medium text-sm">{t('nav.logout', 'Logout')}</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                         text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+              >
+                <FiUser className="w-5 h-5" />
+                <span className="font-medium">{t('nav.login', 'Login')}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Sidebar;
